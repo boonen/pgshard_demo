@@ -74,7 +74,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Configure VMs based on Ubuntu box
       if srv.vm.box == "ubuntu/trusty64"
         # Enable default synced folder
-        srv.vm.synced_folder "../", "/vagrant", :mount_options => ["dmode=644,fmode=644"]
+        srv.vm.synced_folder "../", "/vagrant", type: "rsync", rsync__exclude: ".git/"
         # Copy files into the VM
         srv.vm.provision "file", source: "ansible/vagrant_id_rsa", destination: ".ssh/id_rsa"
         srv.vm.provision "file", source: "ansible/vagrant_id_rsa.pub", destination: ".ssh/id_rsa.pub"
