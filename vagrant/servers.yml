@@ -1,0 +1,26 @@
+---
+- name: ansible
+  box: ubuntu/trusty64
+  ram: 1024
+  vcpu: 1
+  priv_ip: 10.1.0.10
+- name: consul-master
+  box: coreos
+  ram: 256
+  vcpu: 1
+  priv_ip: 10.10.0.10
+- name: coreos-01
+  box: coreos
+  ram: 512
+  vcpu: 1
+  priv_ip: 10.10.0.11
+- name: coreos-02
+  box: coreos
+  ram: 512
+  vcpu: 1
+  priv_ip: 10.10.0.12
+- name: coreos-03
+  box: coreos
+  ram: 512
+  vcpu: 1
+  priv_ip: 10.10.0.13

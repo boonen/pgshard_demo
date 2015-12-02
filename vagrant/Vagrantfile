@@ -1,0 +1,106 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Specify Vagrant version, Vagrant API version, and Vagrant clone location
+Vagrant.require_version ">= 1.6.0"
+VAGRANTFILE_API_VERSION = "2"
+ENV['VAGRANT_VMWARE_CLONE_DIRECTORY'] = '~/.vagrant'
+ENV["VAGRANT_DETECTED_OS"] = ENV["VAGRANT_DETECTED_OS"].to_s + " cygwin"
+UPDATE_CHANNEL = "alpha"
+IMAGE_VERSION = "current"
+
+# Require 'yaml' and 'fileutils' modules
+require 'yaml'
+require 'fileutils'
+
+# Read YAML file with VM details (box, CPU, RAM, IP addresses)
+# Be sure to edit servers.yml to provide correct IP addresses
+servers = YAML.load_file('servers.yml')
+
+# Create and configure the VMs
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  # Always use Vagrant's default insecure key
+  config.ssh.insert_key = false
+  config.hostmanager.enabled = false
+  config.hostmanager.manage_host = true
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline = true
+
+  # Iterate through entries in YAML file to create VMs
+  servers.each do |servers|
+    config.vm.define servers["name"] do |srv|
+      # Don't check for box updates
+      srv.vm.box_check_update = false
+      srv.vm.hostname = servers["name"]
+      srv.vm.box = servers["box"]
+      # Assign an additional static private network
+      srv.vm.network "private_network", ip: servers["priv_ip"]
+      # Configure VMs based on CoreOS box
+      if srv.vm.box == "coreos"
+        srv.vm.box = "coreos-%s" % UPDATE_CHANNEL
+        if IMAGE_VERSION != "current"
+          config.vm.box_version = "#{IMAGE_VERSION}"
+        end
+        config.vm.box_url = "http://%s.release.core-os.net/amd64-usr/%s/coreos_production_vagrant.json" % [UPDATE_CHANNEL, IMAGE_VERSION]
+
+        # Disable default synced folder for CoreOS VMs
+        srv.vm.synced_folder ".", "/vagrant", disabled: true
+
+        # Automatically set hostnames of other vagrant machines
+        srv.vm.provision "shell", inline: "touch /etc/hosts"
+        srv.vm.provision :hostmanager
+
+        # Copy systemd configurations into the VM
+        srv.vm.provision :shell, inline: "mkdir -p /tmp/consul && chmod 777 /tmp/consul"
+        if srv.vm.hostname == "consul-master"
+          # Copy user_data file into CoreOS VM
+          srv.vm.provision "file", source: "coreos/user-data-consul", destination: "/tmp/vagrantfile-user-data"
+
+          srv.vm.provision "file", source: "consul/consul_service.conf", destination: "/tmp/consul/consul.service"
+        else
+          # Copy user_data file into CoreOS VM
+          srv.vm.provision "file", source: "coreos/user-data", destination: "/tmp/vagrantfile-user-data"
+
+          srv.vm.provision "file", source: "consul/consul_join_service.conf", destination: "/tmp/consul/consul.service"
+        end
+        srv.vm.provision "file", source: "consul/registrator_service.conf", destination: "/tmp/consul/registrator.service"
+
+        # Move user_data to correct location to be processed by cloud-init
+        srv.vm.provision "shell", inline: "mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/", privileged: true
+        # Run final provisioning script
+        srv.vm.provision "shell", path: "consul/provision_consul.sh"
+      end
+      # Configure VMs based on Ubuntu box
+      if srv.vm.box == "ubuntu/trusty64"
+        # Enable default synced folder
+        srv.vm.synced_folder "../", "/vagrant", :mount_options => ["dmode=644,fmode=644"]
+        # Copy files into the VM
+        srv.vm.provision "file", source: "ansible/vagrant_id_rsa", destination: ".ssh/id_rsa"
+        srv.vm.provision "file", source: "ansible/vagrant_id_rsa.pub", destination: ".ssh/id_rsa.pub"
+        # Run final provisioning script
+        srv.vm.provision "shell", path: "ansible/provision_ansible.sh"
+      end
+      # Configure VMs with RAM and CPUs per settings in servers.yml
+      srv.vm.provider :virtualbox do |vb|
+         vb.memory = servers["ram"]
+         vb.cpus = servers["vcpu"]
+         vb.check_guest_additions = false
+         vb.functional_vboxsf = false
+         vb.gui = false
+      end
+
+      if $enable_serial_logging
+        logdir = File.join(File.dirname(__FILE__), "log")
+        FileUtils.mkdir_p(logdir)
+
+        serialFile = File.join(logdir, "%s-serial.txt" % servers["name"])
+        FileUtils.touch(serialFile)
+        srv.vm.provider :virtualbox do |vb|
+         vb.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
+         vb.customize ["modifyvm", :id, "--uartmode1", serialFile]
+        end
+      end
+    end
+  end
+end

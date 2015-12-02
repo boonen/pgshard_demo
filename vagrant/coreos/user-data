@@ -1,0 +1,30 @@
+#cloud-config
+
+coreos:
+  units:
+    - name: etcd.service
+      command: stop
+      enable: false
+    - name: fleet.service
+      command: stop
+      enable: false
+    - name: docker-tcp.socket
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Docker Socket for the API
+
+        [Socket]
+        ListenStream=2375
+        BindIPv6Only=both
+        Service=docker.service
+
+        [Install]
+        WantedBy=sockets.target
+    - name: docker.service
+      drop-ins:
+        - name: 10-cluster-store.conf
+          content: |
+            [Service]
+            Environment='DOCKER_OPTS=--cluster-store="consul://10.10.0.10:8500" --cluster-advertise="$public_ipv4:2375"'
