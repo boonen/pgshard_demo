@@ -11,7 +11,7 @@ RUN apk update && \
   export PATH=/usr/local/pgsql/bin/:$PATH && \
   make PG_CPPFLAGS="--std=c99 -Wall -Wextra -Wno-error -Wno-unused-parameter -Iinclude -I/usr/include -Itest/include -I. -I./ -I/usr/include/postgresql/server -I/usr/include/postgresql/internal" && \
   make install && \
-  apk del alpine-sdk && \
+  apk del alpine-sdk --force && \
   curl -o /usr/local/bin/gosu -sSL "https://github.com/tianon/gosu/releases/download/1.2/gosu-amd64" && \
   chmod +x /usr/local/bin/gosu
 
