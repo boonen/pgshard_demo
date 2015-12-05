@@ -26,10 +26,10 @@ RUN apk update && \
   tar xzf gdal-${GDAL_VERSION}.tar.gz && \
   tar xzf postgis-${POSTGIS_VERSION}.tar.gz && \
   tar xzf pg_shard-${PG_SHARD_VERSION}.tar.gz && \  
-  cd proj.4* && ./configure && make -s && make -s install && \
-  cd ../geos* && ./autogen.sh && ./configure CFLAGS="-D__sun -D__GNUC__" && make -s && make -s install && \
-  cd ../gdal* && ./configure --with-static-proj4=/usr/local/lib --without-ogr && make -s && make -s install && \
-  cd ../postgis* && ./configure -- && make -s && make -s install && \
+  cd proj.4* && ./configure --enable-silent-rules && make -s && make -s install && \
+  cd ../libgeos* && ./autogen.sh && ./configure --enable-silent-rules CFLAGS="-D__sun -D__GNUC__" && make -s && make -s install && \
+  cd ../gdal* && ./configure --enable-silent-rules --with-static-proj4=/usr/local/lib --without-ogr && make -s && make -s install && \
+  cd ../postgis* && ./configure --enable-silent-rules -- && make -s && make -s install && \
   cd ../pg_shard* && \
     make -s PG_CPPFLAGS="--std=c99 -Wall -Wextra -Wno-error -Wno-unused-parameter -Iinclude -I/usr/include -Itest/include -I. -I./ -I/usr/include/postgresql/server -I/usr/include/postgresql/internal" && \
     make -s install && \
