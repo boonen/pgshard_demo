@@ -21,7 +21,11 @@ RUN apk update && \
   curl -o gdal-${GDAL_VERSION}.tar.gz -sSL http://download.osgeo.org/gdal/2.0.1/gdal-${GDAL_VERSION}.tar.gz && \
   curl -o pg_shard-${PG_SHARD_VERSION}.tar.gz -sSL https://github.com/citusdata/pg_shard/archive/v${PG_SHARD_VERSION}.tar.gz && \
   export PATH=/usr/local/pgsql/bin/:$PATH && \
-  tar xzf *.tar.gz && \
+  tar xzf proj4-${PROJ_VERSION}.tar.gz && \
+  tar xzf geos-${GEOS_VERSION}.tar.gz && \
+  tar xzf gdal-${GDAL_VERSION}.tar.gz && \
+  tar xzf postgis-${POSTGIS_VERSION}.tar.gz && \
+  tar xzf pg_shard-${PG_SHARD_VERSION}.tar.gz && \  
   cd proj.4-${PROJ4_VERSION}* && ./configure && make && make install && \
   cd ../geos-${GEOS_VERSION} && ./autogen.sh && ./configure CFLAGS="-D__sun -D__GNUC__" && make && make install && \
   cd ../gdal-$GDAL_VERSION && ./configure --with-static-proj4=/usr/local/lib --without-ogr && make && make install && \
