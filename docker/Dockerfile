@@ -26,13 +26,13 @@ RUN apk update && \
   tar xzf gdal-${GDAL_VERSION}.tar.gz && \
   tar xzf postgis-${POSTGIS_VERSION}.tar.gz && \
   tar xzf pg_shard-${PG_SHARD_VERSION}.tar.gz && \  
-  cd proj.4-${PROJ4_VERSION}* && ./configure && make && make install && \
-  cd ../geos-${GEOS_VERSION} && ./autogen.sh && ./configure CFLAGS="-D__sun -D__GNUC__" && make && make install && \
-  cd ../gdal-$GDAL_VERSION && ./configure --with-static-proj4=/usr/local/lib --without-ogr && make && make install && \
-  cd ../postgis-${POSTGIS_VERSION} && ./configure -- && make && make install && \
-  cd ../pg_shard-${PG_SHARD_VERSION} && \
-    make PG_CPPFLAGS="--std=c99 -Wall -Wextra -Wno-error -Wno-unused-parameter -Iinclude -I/usr/include -Itest/include -I. -I./ -I/usr/include/postgresql/server -I/usr/include/postgresql/internal" && \
-    make install && \
+  cd proj.4* && ./configure && make -s && make -s install && \
+  cd ../geos* && ./autogen.sh && ./configure CFLAGS="-D__sun -D__GNUC__" && make -s && make -s install && \
+  cd ../gdal* && ./configure --with-static-proj4=/usr/local/lib --without-ogr && make -s && make -s install && \
+  cd ../postgis* && ./configure -- && make -s && make -s install && \
+  cd ../pg_shard* && \
+    make -s PG_CPPFLAGS="--std=c99 -Wall -Wextra -Wno-error -Wno-unused-parameter -Iinclude -I/usr/include -Itest/include -I. -I./ -I/usr/include/postgresql/server -I/usr/include/postgresql/internal" && \
+    make -s install && \
   apk del curl libxml2-dev json-c-dev alpine-sdk autoconf automake libtool git --force && \
   rm /var/cache/apk/* && \
   rm -rf /tmp/build && \
