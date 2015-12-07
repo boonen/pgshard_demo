@@ -25,7 +25,7 @@ RUN apk update && \
   cd proj.4-${PROJ4_VERSION}* && ./configure && make && make install && \
   cd ../geos-${GEOS_VERSION} && ./autogen.sh && ./configure CFLAGS="-D__sun -D__GNUC__" && make && make install && \
   cd ../gdal-$GDAL_VERSION && ./configure --with-static-proj4=/usr/local/lib --without-ogr && make && make install && \
-  cd ../postgis-${POSTGIS_VERSION} && ./configure -- && make && make install && \
+  cd ../postgis-${POSTGIS_VERSION} && ./autogen.sh && ./configure --wit-projdir=/usr/lib && make && make install && \
   cd ../pg_shard-{PG_SHARD_VERSION} && \
     make PG_CPPFLAGS="--std=c99 -Wall -Wextra -Wno-error -Wno-unused-parameter -Iinclude -I/usr/include -Itest/include -I. -I./ -I/usr/include/postgresql/server -I/usr/include/postgresql/internal" && \
     make install && \
