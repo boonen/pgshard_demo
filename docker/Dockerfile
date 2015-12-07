@@ -23,7 +23,7 @@ RUN apk update && \
   export PATH=/usr/local/pgsql/bin/:$PATH && \
   tar xzf *.tar.gz && \
   cd proj.4-${PROJ4_VERSION}* && ./configure && make && make install && \
-  cd ../geos-${GEOS_VERSION} && ./autogen.sh && ./configure CFLAGS="-D__sun -D__GNUC__" && make && make install && \
+  cd ../geos-${GEOS_VERSION} && ./autogen.sh && ./configure CFLAGS="-D__sun -D__GNUC__"  CXXFLAGS="-D__GNUC___ -D__sun" && make && make install && \
   cd ../gdal-$GDAL_VERSION && ./configure --with-static-proj4=/usr/local/lib --without-ogr && make && make install && \
   cd ../postgis-${POSTGIS_VERSION} && ./configure -- && make && make install && \
   cd ../pg_shard-{PG_SHARD_VERSION} && \
