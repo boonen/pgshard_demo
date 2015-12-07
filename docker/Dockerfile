@@ -19,16 +19,20 @@ RUN apk update && \
   curl -o geos-${GEOS_VERSION}.tar.gz -sSL https://github.com/libgeos/libgeos/archive/${GEOS_VERSION}.tar.gz && \
   curl -o proj4-${PROJ4_VERSION}.tar.gz -sSL https://github.com/OSGeo/proj.4/archive/${PROJ4_VERSION}.tar.gz && \
   curl -o gdal-${GDAL_VERSION}.tar.gz -sSL http://download.osgeo.org/gdal/2.0.1/gdal-${GDAL_VERSION}.tar.gz && \
-  curl -o pg_shard-{PG_SHARD_VERSION}.tar.gz -sSL https://github.com/citusdata/pg_shard/archive/v${PG_SHARD_VERSION}.tar.gz
+  curl -o pg_shard-${PG_SHARD_VERSION}.tar.gz -sSL https://github.com/citusdata/pg_shard/archive/v${PG_SHARD_VERSION}.tar.gz && \
   export PATH=/usr/local/pgsql/bin/:$PATH && \
-  tar xzf *.tar.gz && \
-  cd proj.4-${PROJ4_VERSION}* && ./configure && make && make install && \
-  cd ../geos-${GEOS_VERSION} && ./autogen.sh && ./configure CFLAGS="-D__sun -D__GNUC__" && make && make install && \
-  cd ../gdal-$GDAL_VERSION && ./configure --with-static-proj4=/usr/local/lib --without-ogr && make && make install && \
-  cd ../postgis-${POSTGIS_VERSION} && ./autogen.sh && ./configure --wit-projdir=/usr/lib && make && make install && \
-  cd ../pg_shard-{PG_SHARD_VERSION} && \
-    make PG_CPPFLAGS="--std=c99 -Wall -Wextra -Wno-error -Wno-unused-parameter -Iinclude -I/usr/include -Itest/include -I. -I./ -I/usr/include/postgresql/server -I/usr/include/postgresql/internal" && \
-    make install && \
+  tar xzf proj4-${PROJ4_VERSION}.tar.gz && \
+  tar xzf geos-${GEOS_VERSION}.tar.gz && \
+  tar xzf gdal-${GDAL_VERSION}.tar.gz && \
+  tar xzf postgis-${POSTGIS_VERSION}.tar.gz && \
+  tar xzf pg_shard-${PG_SHARD_VERSION}.tar.gz && \  
+  cd proj.4* && ./configure --enable-silent-rules && make -s && make -s install && \
+  cd ../libgeos* && ./autogen.sh && ./configure --enable-silent-rules CFLAGS="-D__sun -D__GNUC__"  CXXFLAGS="-D__GNUC___ -D__sun" && make -s && make -s install && \
+  cd ../gdal* && ./configure --enable-silent-rules --with-static-proj4=/usr/local/lib && make -s && make -s install && \
+  cd ../postgis* && ./autogen.sh && ./configure --enable-silent-rules --with-projdir=/usr/local && make -s && make -s install && \
+  cd ../pg_shard* && \
+    make -s PG_CPPFLAGS="--std=c99 -Wall -Wextra -Wno-error -Wno-unused-parameter -Iinclude -I/usr/include -Itest/include -I. -I./ -I/usr/include/postgresql/server -I/usr/include/postgresql/internal" && \
+    make -s install && \
   apk del curl libxml2-dev json-c-dev alpine-sdk autoconf automake libtool git --force && \
   rm /var/cache/apk/* && \
   rm -rf /tmp/build && \
