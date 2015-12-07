@@ -28,7 +28,7 @@ RUN apk update && \
   tar xzf pg_shard-${PG_SHARD_VERSION}.tar.gz && \  
   cd proj.4* && ./configure --enable-silent-rules && make -s && make -s install && \
   cd ../libgeos* && ./autogen.sh && ./configure --enable-silent-rules CFLAGS="-D__sun -D__GNUC__"  CXXFLAGS="-D__GNUC___ -D__sun" && make -s && make -s install && \
-  cd ../gdal* && ./configure --enable-silent-rules --with-static-proj4=/usr/local/lib --without-ogr && make -s && make -s install && \
+  cd ../gdal* && ./configure --enable-silent-rules --with-static-proj4=/usr/local/lib && make -s && make -s install && \
   cd ../postgis* && ./configure --enable-silent-rules -- && make -s && make -s install && \
   cd ../pg_shard* && \
     make -s PG_CPPFLAGS="--std=c99 -Wall -Wextra -Wno-error -Wno-unused-parameter -Iinclude -I/usr/include -Itest/include -I. -I./ -I/usr/include/postgresql/server -I/usr/include/postgresql/internal" && \
