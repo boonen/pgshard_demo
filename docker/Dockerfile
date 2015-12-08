@@ -11,7 +11,7 @@ RUN echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/reposito
 
 # Install PostgreSQL and build Proj.4, GEOS, GDAL, PostGIS and PG_Shard from sources. Then cleanup
 RUN apk update && \
-  apk add curl libxml2-dev json-c-dev alpine-sdk autoconf automake libtool \
+  apk add curl libxml2 json-c libxml2-dev json-c-dev alpine-sdk autoconf automake libtool \
     "postgresql@edge>9.4" "postgresql-contrib@edge>9.4" "postgresql-dev@edge>9.4" && \
   rm /var/cache/apk/* && \
   mkdir -p /tmp/build && cd /tmp/build && \
@@ -35,8 +35,8 @@ RUN apk update && \
   cd ../pg_shard* && \
     make -s PG_CPPFLAGS="--std=c99 -Wall -Wextra -Wno-error -Wno-unused-parameter -Iinclude -I/usr/include -Itest/include -I. -I./ -I/usr/include/postgresql/server -I/usr/include/postgresql/internal" && \
     make -s install && \
-  apk del curl libxml2-dev json-c-dev alpine-sdk autoconf automake libtool git --force && \
-  rm /var/cache/apk/* && \
+  apk del curl libxml2-dev json-c-dev alpine-sdk autoconf automake libtool git postgresql-dev --force && \
+  rm -rf /var/cache/apk/* && \
   rm -rf /tmp/build && \
   curl -o /usr/local/bin/gosu -sSL "https://github.com/tianon/gosu/releases/download/1.2/gosu-amd64" && \
   chmod +x /usr/local/bin/gosu
