@@ -13,7 +13,8 @@ RUN echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/reposito
 RUN apk update && \
   apk add curl libxml2 json-c libxml2-dev json-c-dev alpine-sdk autoconf automake libtool \
     "postgresql@edge>9.4" "postgresql-contrib@edge>9.4" "postgresql-dev@edge>9.4" && \
-  rm /var/cache/apk/* && \
+  curl -o /usr/local/bin/gosu -sSL "https://github.com/tianon/gosu/releases/download/1.2/gosu-amd64" && \
+  chmod +x /usr/local/bin/gosu && \
   mkdir -p /tmp/build && cd /tmp/build && \
   curl -o postgis-${POSTGIS_VERSION}.tar.gz -sSL http://download.osgeo.org/postgis/source/postgis-${POSTGIS_VERSION}.tar.gz && \
   curl -o geos-${GEOS_VERSION}.tar.gz -sSL https://github.com/libgeos/libgeos/archive/${GEOS_VERSION}.tar.gz && \
@@ -37,9 +38,7 @@ RUN apk update && \
     make -s install && \
   apk del curl libxml2-dev json-c-dev alpine-sdk autoconf automake libtool git postgresql-dev --force && \
   rm -rf /var/cache/apk/* && \
-  rm -rf /tmp/build && \
-  curl -o /usr/local/bin/gosu -sSL "https://github.com/tianon/gosu/releases/download/1.2/gosu-amd64" && \
-  chmod +x /usr/local/bin/gosu
+  rm -rf /tmp/build
 
 RUN mkdir /docker-entrypoint-initdb.d
 
