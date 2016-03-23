@@ -47,7 +47,7 @@ ENV PGDATA /var/lib/postgresql/data
 
 VOLUME $PGDATA
 
-ADD docker-entrypoint.sh /
+ADD assets/docker-entrypoint.sh /
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
