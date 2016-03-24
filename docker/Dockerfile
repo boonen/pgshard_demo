@@ -12,7 +12,7 @@ RUN echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/reposito
 # Install PostgreSQL and build Proj.4, GEOS, GDAL, PostGIS and PG_Shard from sources. Then cleanup
 RUN apk update && \
   apk add curl libxml2 json-c libxml2-dev json-c-dev alpine-sdk autoconf automake libtool \
-    "postgresql@edge>9.4" "postgresql-contrib@edge>9.4" "postgresql-dev@edge>9.4" && \
+    "postgresql@edge<9.5" "postgresql-contrib@edge<9.5" "postgresql-dev@edge<9.5" && \
   curl -o /usr/local/bin/gosu -sSL "https://github.com/tianon/gosu/releases/download/1.2/gosu-amd64" && \
   chmod +x /usr/local/bin/gosu && \
   mkdir -p /tmp/build && cd /tmp/build && \
